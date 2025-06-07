@@ -8,6 +8,8 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update && apt-get install -y \
     python3.10 \
     python3-pip \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -19,8 +21,8 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Copy only necessary files
-COPY app.py model.py model.onnx ./
+# Copy the entire project directory (excluding .git, __pycache__, and .pytest_cache)
+COPY . .
 
 # Set environment variables for ONNX Runtime
 ENV OMP_NUM_THREADS=1
@@ -30,4 +32,4 @@ ENV MKL_NUM_THREADS=1
 EXPOSE 8000
 
 # Run the application
-CMD ["python3", "app.py"] 
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"] 
