@@ -1,85 +1,151 @@
 # Image Classification Model Deployment
 
-This project is based on MTailor Assignment which implements a serverless deployment of an image classification model using Cerebrium. The model is trained on the ImageNet dataset and can classify images into 1000 different classes.
+This project deploys an ImageNet-trained classification model on Cerebrium's serverless platform. The model is converted from PyTorch to ONNX format for optimized inference.
 
 ## Project Structure
 
 ```
 mtailor-mlops-assignment/
-├── README.md                 # Project documentation
-├── requirements.txt          # Python dependencies
-├── Dockerfile               # Docker configuration
-├── app.py                   # FastAPI application
-├── model.py                 # ONNX model implementation
-├── convert_to_onnx.py       # PyTorch to ONNX conversion
-├── test.py                  # Local testing
-├── test_server.py           # Deployment testing
-└── pytorch_model.py         # Original PyTorch model
+├── src/                    # Source code
+│   ├── model.py           # ONNX model loading and prediction
+│   ├── preprocess.py      # Image preprocessing
+│   └── app.py            # FastAPI application
+├── models/                # Model files
+│   ├── pytorch_model.py
+│   ├── pytorch_model_weights.pth
+│   └── model.onnx        # Converted ONNX model
+├── tests/                 # Test files
+│   ├── test_model.py     # Local model tests
+│   └── test_server.py    # Deployment tests
+├── assets/               # Test images
+│   ├── n01440764_tench.jpeg
+│   └── n01667114_mud_turtle.JPEG
+├── Dockerfile           # Custom Docker image
+├── requirements.txt     # Dependencies
+└── README.md           # Documentation
 ```
 
 ## Setup
 
-1. Create and activate a virtual environment:
-   ```bash
-   conda create -n mtailor_assignment python=3.10
-   conda activate mtailor_assignment
-   ```
-
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. Convert PyTorch model to ONNX:
-   ```bash
-   python convert_to_onnx.py --model_path pytorch_model_weights.pth --onnx_path model.onnx
-   ```
-
-## Local Testing
-
-Run the test suite:
+1. Create a virtual environment:
 ```bash
-pytest test.py
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-## Testing Deployment
+3. Set up environment variables:
+```bash
+# Create .env file
+echo "CEREBRIUM_API_KEY=your_api_key" > .env
+echo "CEREBRIUM_API_URL=your_api_url" >> .env
+```
 
-1. Test single image:
-   ```bash
-   python test_server.py --image_path path/to/image.jpg
-   ```
+## Model Conversion
 
-2. Run all test cases:
-   ```bash
-   python test_server.py --run_tests
-   ```
+Convert the PyTorch model to ONNX format:
+```bash
+python src/convert_to_onnx.py
+```
 
-## API Endpoints
+## Testing
 
-- `POST /predict`: Upload an image for classification
-  - Input: Image file
-  - Output: JSON with class ID, confidence, and response time
+1. Test the local model:
+```bash
+pytest tests/test_model.py
+```
 
-- `GET /health`: Health check endpoint
-  - Output: Status of the service
+2. Test the deployed model:
+```bash
+# Test single image
+python tests/test_server.py --image_path assets/n01440764_tench.jpeg
+
+# Run all test cases
+python tests/test_server.py --run_tests
+```
+
+## Deployment
+
+1. Build the Docker image:
+```bash
+docker build -t mtailor-mlops-assignment .
+```
+
+2. Deploy to Cerebrium:
+```bash
+cerebrium deploy
+```
+
+## API Usage
+
+The deployed model exposes a `/predict` endpoint that accepts image files:
+
+```python
+import requests
+
+url = "https://api.cortex.cerebrium.ai/v4/p-4419db4c/mtailor-mlops-assignment/predict"
+headers = {
+    "Authorization": f"Bearer {api_key}"
+}
+
+with open("image.jpg", "rb") as f:
+    files = {"file": ("image.jpg", f, "image/jpeg")}
+    response = requests.post(url, headers=headers, files=files)
+
+result = response.json()
+print(result)
+```
+
+Response format:
+```json
+{
+    "class_id": 0,
+    "confidence": 0.95,
+    "predictions": [...],
+    "inference_time": 0.1
+}
+```
 
 ## Model Details
 
-- Input: RGB image (224x224)
-- Output: Class probabilities (1000 classes)
+- Input: 224x224 RGB image
+- Output: 1000 class probabilities (ImageNet classes)
 - Preprocessing:
+  - Convert to RGB
   - Resize to 224x224
-  - Normalize with ImageNet mean/std
-  - Convert to NCHW format
+  - Normalize using ImageNet mean/std
+- Expected response time: < 3 seconds
 
-## Performance
+## Testing Strategy
 
-- Response time: < 3 seconds
-- GPU acceleration enabled
-- Batch size: 1
+1. Local Model Tests:
+   - Model initialization
+   - Image preprocessing
+   - Prediction format
+   - Error handling
 
+2. Deployment Tests:
+   - API endpoint availability
+   - Prediction accuracy
+   - Response time monitoring
+   - Error handling
 
-## License
+## Performance Monitoring
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+The test suite monitors:
+- Prediction accuracy
+- Response times
+- Inference times
+- Error rates
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request 

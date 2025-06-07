@@ -1,26 +1,31 @@
-FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+# Use Python 3.9 slim image
+FROM python:3.9-slim
 
-ENV PYTHONUNBUFFERED=1 \
-    DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
-
+# Set working directory
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-RUN pip3 install --no-cache-dir -r requirements.txt
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copy application code
+COPY src/ ./src/
+COPY models/ ./models/
 
-RUN mkdir -p /app/models
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PORT=8000
 
-ENV OMP_NUM_THREADS=1
-ENV MKL_NUM_THREADS=1
-
+# Expose port
 EXPOSE 8000
 
-CMD ["python3", "app.py"] 
+# Run the application
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"] 
