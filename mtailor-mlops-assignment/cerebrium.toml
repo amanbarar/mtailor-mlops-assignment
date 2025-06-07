@@ -16,7 +16,7 @@ region = "us-east-1"
 [cerebrium.runtime.custom]
 port = 8000
 healthcheck_endpoint = "/health"
-dockerfile_path = "./Dockerfile"
+dockerfile_path = "../Dockerfile"
 
 [cerebrium.scaling]
 min_replicas = 1
