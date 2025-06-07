@@ -32,7 +32,7 @@ jobs:
     
     - name: Build Docker image
       run: |
-        docker build -t mtailor-mlops-assignment:test .
+        docker build -t mtailor-mlops-assignment:test ./mtailor-mlops-assignment
     
     - name: Test Docker image
       run: |
