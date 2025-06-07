@@ -1,9 +1,11 @@
-import pytest
+import sys
 from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent / "src"))
+import pytest
 from PIL import Image
 import numpy as np
 
-from src.model import ONNXModel
+from model import ONNXModel
 
 @pytest.fixture
 def model():
@@ -56,5 +58,10 @@ def test_predict(model, test_image):
 
 def test_invalid_image(model):
     """Test handling of invalid image."""
+    import pytest
+    # Passing None
     with pytest.raises(Exception):
-        model.predict(Image.new('RGB', (10, 10))) 
+        model.predict(None)
+    # Passing a non-image type
+    with pytest.raises(Exception):
+        model.predict("not an image") 

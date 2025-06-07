@@ -55,6 +55,9 @@ class ONNXModel:
         # Add batch dimension
         img_array = np.expand_dims(img_array, axis=0)
         
+        # Ensure float32 dtype
+        img_array = img_array.astype(np.float32)
+        
         return img_array
     
     def predict(self, image: Image.Image) -> Dict[str, Any]:
@@ -67,24 +70,30 @@ class ONNXModel:
         Returns:
             Dict[str, Any]: Prediction results including class_id and confidence
         """
+        if image is None:
+            raise ValueError("Input image cannot be None")
+        if not hasattr(image, 'size') or image.size[0] <= 0 or image.size[1] <= 0:
+            raise ValueError("Invalid image size")
+        
         # Preprocess image
-        input_tensor = self.preprocess_image(image)
+        img_array = self.preprocess_image(image)
         
         # Run inference
         outputs = self.session.run(
             [self.output_name],
-            {self.input_name: input_tensor}
+            {self.input_name: img_array}
         )
         
         # Get predictions
-        predictions = outputs[0][0]
-        class_id = np.argmax(predictions)
-        confidence = float(predictions[class_id])
+        logits = outputs[0]
+        probabilities = np.exp(logits) / np.sum(np.exp(logits), axis=1, keepdims=True)
+        class_id = np.argmax(probabilities)
+        confidence = float(probabilities[0, class_id])
         
         return {
             "class_id": int(class_id),
             "confidence": confidence,
-            "predictions": predictions.tolist()
+            "predictions": probabilities[0].tolist()
         }
 
 def load_model() -> ONNXModel:

@@ -6,6 +6,7 @@ from pathlib import Path
 
 # Add parent directory to path to import pytorch_model
 sys.path.append(str(Path(__file__).parent.parent))
+sys.path.append(str(Path(__file__).parent.parent / "src"))
 from models.pytorch_model import Classifier
 
 def convert_to_onnx():

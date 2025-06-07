@@ -5,7 +5,7 @@ import io
 import time
 from typing import Dict, Any
 
-from model import load_model
+from src.model import load_model
 
 app = FastAPI(title="Image Classification API")
 model = None
