@@ -137,8 +137,10 @@ def main():
     args = parser.parse_args()
     
     # Get API credentials from environment
-    api_key = os.getenv('CEREBRIUM_API_KEY')
-    api_url = os.getenv('CEREBRIUM_API_URL')
+    cerebrium_api_key = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcm9qZWN0SWQiOiJwLTQ0MTlkYjRjIiwibmFtZSI6IiIsImRlc2NyaXB0aW9uIjoiIiwiZXhwIjoxNzUxNzYwMDAwfQ.FzDHlptW0EqATb5dUSM3CaOGOBFFs9ZiR5KyRetyk5NHL9RL9IF4cL1ZNkzzEoz4fileveDXd3unxC9B8wJ04gP5sLsvhdXAYLl44_xlhRo6-HFRzwxSsdXrPfbc3Bl3CXXaIuFzBLc4gPIKS4Ii-qgqJXhwEMAcWxJ4P4_t0JXuFs410_s9-8bSkDwufe-6GOxQpFhGZrYMaUW1jk6i2TfdGiW86nxlRuGCCgya_V8lbV7iL5v8TTJRZd_WMj2NRyO2uDfBaWSte6cX85Rhkro_8BjFT2J6HNbn_5-54K11TzQ2Dm1AxO-TC0H14v5zv11_Tr3dOYpxsKd-VaJkxg'
+    cerebrium_api_url = 'https://api.cortex.cerebrium.ai/v4/p-4419db4c/mtailor-mlops-assignment/predict'
+    api_key = cerebrium_api_key
+    api_url = cerebrium_api_url
     
     if not api_key or not api_url:
         raise ValueError("CEREBRIUM_API_KEY and CEREBRIUM_API_URL must be set in environment")
