@@ -25,7 +25,7 @@ jobs:
     
     - name: Run tests
       run: |
-        pytest test.py
+        pytest tests/
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -36,5 +36,5 @@ jobs:
     
     - name: Test Docker image
       run: |
-        docker run --rm image-classification:test python -c "import torch; print('PyTorch version:', torch.__version__)"
-        docker run --rm image-classification:test python -c "import onnxruntime; print('ONNX Runtime version:', onnxruntime.__version__)" 
+        docker run --rm image-classification:test python3 -c "import onnxruntime; print('ONNX Runtime version:', onnxruntime.__version__)"
+        docker run --rm image-classification:test python3 -c "import uvicorn; print('Uvicorn version:', uvicorn.__version__)"
