@@ -32,9 +32,9 @@ jobs:
     
     - name: Build Docker image
       run: |
-        docker build -t image-classification:test .
+        docker build -t mtailor-mlops-assignment:test .
     
     - name: Test Docker image
       run: |
-        docker run --rm image-classification:test python3 -c "import onnxruntime; print('ONNX Runtime version:', onnxruntime.__version__)"
-        docker run --rm image-classification:test python3 -c "import uvicorn; print('Uvicorn version:', uvicorn.__version__)"
+        docker run --rm mtailor-mlops-assignment:test python3 -c "import onnxruntime; print('ONNX Runtime version:', onnxruntime.__version__)"
+        docker run --rm mtailor-mlops-assignment:test python3 -c "import uvicorn; print('Uvicorn version:', uvicorn.__version__)"
