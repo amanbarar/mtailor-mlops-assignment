@@ -45,7 +45,6 @@ venv.bak/
 *.joblib
 wandb/
 mlruns/
-models/
 checkpoints/
 
 
